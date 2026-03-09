@@ -1,0 +1,126 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+struct Node {
+    int data;
+    struct Node *next;
+};
+
+struct Node *head = NULL;
+
+void insert(int value) {
+    struct Node *newNode, *temp;
+
+    newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->data = value;
+
+    if (head == NULL) {
+        head = newNode;
+        newNode->next = head;
+    } 
+    else {
+        temp = head;
+        while (temp->next != head) {
+            temp = temp->next;
+        }
+        temp->next = newNode;
+        newNode->next = head;
+    }
+    printf("Inserted\n");
+}
+
+void deleteNode(int value) {
+    struct Node *temp = head, *prev;
+
+    if (head == NULL) {
+        printf("List is empty\n");
+        return;
+    }
+
+    temp = head;
+    prev = NULL;
+    if (head->data == value) {
+
+        if (head->next == head) {
+            free(head);
+            head = NULL;
+            printf("Deleted\n");
+            return;
+        }
+
+        while (temp->next != head) {
+            temp = temp->next;
+        }
+
+        temp->next = head->next;
+        free(head);
+        head = temp->next;
+        printf("Deleted\n");
+        return;
+    }
+
+    prev = head;
+    temp = head->next;
+
+    while (temp != head && temp->data != value) {
+        prev = temp;
+        temp = temp->next;
+    }
+
+    if (temp == head) {
+        printf("Value not found\n");
+        return;
+    }
+
+    prev->next = temp->next;
+    free(temp);
+    printf("Deleted\n");
+}
+
+void display() {
+    struct Node *temp;
+
+    if (head == NULL) {
+        printf("List is empty\n");
+        return;
+    }
+
+    temp = head;
+    do {
+        printf("%d ", temp->data);
+        temp = temp->next;
+    } while (temp != head);
+
+    printf("\n");
+}
+
+int main() {
+    int choice, value;
+
+    while (1) {
+        printf("\n1.Insert 2.Delete 3.Display 4.Exit\n");
+        printf("Enter choice: ");
+        scanf("%d", &choice);
+
+        if (choice == 1) {
+            printf("Enter value: ");
+            scanf("%d", &value);
+            insert(value);
+        }
+        else if (choice == 2) {
+            printf("Enter value to delete: ");
+            scanf("%d", &value);
+            deleteNode(value);
+        }
+        else if (choice == 3) {
+            display();
+        }
+        else if (choice == 4) {
+            break;
+        }
+        else {
+            printf("Invalid choice\n");
+        }
+    }
+    return 0;
+}
