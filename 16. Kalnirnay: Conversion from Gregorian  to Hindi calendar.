@@ -1,0 +1,47 @@
+#include <stdio.h>
+int isLeap(int year) {
+    return (year % 400 == 0 || (year % 4 == 0 && year % 100 != 0));
+}
+
+int monthDays[] = {31,28,31,30,31,30,31,31,30,31,30,31};
+
+char *hindiMonths[] = {
+    "Chaitra", "Vaishakh", "Jyeshtha", "Ashadha",
+    "Shravana", "Bhadrapada", "Ashwin", "Kartika",
+    "Margashirsha", "Pausha", "Magha", "Phalguna"
+};
+
+int main() {
+    int d, m, y, i;
+    int totalDays = 0;
+
+    printf("Enter Gregorian date (dd mm yyyy): ");
+    scanf("%d %d %d", &d, &m, &y);
+
+    for(i = 0; i < m - 1; i++) {
+        totalDays += monthDays[i];
+    }
+
+    if(m > 2 && isLeap(y)) {
+        totalDays += 1;
+    }
+
+    totalDays += d;
+    int hindiDay = totalDays - 80;
+    int hindiYear = y;
+
+    if(hindiDay <= 0) {
+        hindiYear = y - 1;
+        hindiDay += (isLeap(hindiYear) ? 366 : 365);
+    }
+
+    int monthIndex = (hindiDay / 30) % 12;
+    int dayInMonth = (hindiDay % 30) + 1;
+
+    printf("\nApprox Hindi Calendar Date:\n");
+    printf("Day: %d\n", dayInMonth);
+    printf("Month: %s\n", hindiMonths[monthIndex]);
+    printf("Year: %d\n", hindiYear);
+
+    return 0;
+}
