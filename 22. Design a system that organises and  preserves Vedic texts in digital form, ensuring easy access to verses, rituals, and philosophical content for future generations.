@@ -1,0 +1,127 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#define SIZE 10
+
+struct VedicText {
+    char category[20];   
+    char title[100];
+    char content[500];
+    struct VedicText* next;
+};
+
+struct VedicText* table[SIZE];
+int hash(char title[]) {
+    int sum = 0;
+    for (int i = 0; title[i] != '\0'; i++)
+        sum += title[i];
+    return sum % SIZE;
+}
+
+struct VedicText* createNode(char cat[], char title[], char content[]) {
+    struct VedicText* newNode = (struct VedicText*)malloc(sizeof(struct VedicText));
+    strcpy(newNode->category, cat);
+    strcpy(newNode->title, title);
+    strcpy(newNode->content, content);
+    newNode->next = NULL;
+    return newNode;
+}
+void insert(char cat[], char title[], char content[]) {
+    int index = hash(title);
+    struct VedicText* newNode = createNode(cat, title, content);
+    newNode->next = table[index];
+    table[index] = newNode;
+}
+
+void search(char title[]) {
+    int index = hash(title);
+    struct VedicText* temp = table[index];
+    while (temp != NULL) {
+        if (strcmp(temp->title, title) == 0) {
+            printf("\nFound:\n");
+            printf("Category: %s\nTitle: %s\nContent: %s\n",
+                   temp->category, temp->title, temp->content);
+            return;
+        }
+        temp = temp->next;
+    }
+    printf("\nText not found.\n");
+}
+
+void display() {
+    printf("\n--- Vedic Text Database ---\n");
+    for (int i = 0; i < SIZE; i++) {
+        struct VedicText* temp = table[i];
+        if (temp != NULL) {
+            printf("Index %d:\n", i);
+            while (temp != NULL) {
+                printf("  [%s] %s\n", temp->category, temp->title);
+                temp = temp->next;
+            }
+        }
+    }
+}
+
+void saveToFile() {
+    FILE *fp = fopen("vedic_texts.txt", "w");
+    for (int i = 0; i < SIZE; i++) {
+        struct VedicText* temp = table[i];
+
+        while (temp != NULL) {
+            fprintf(fp, "%s|%s|%s\n",
+                    temp->category,
+                    temp->title,
+                    temp->content);
+            temp = temp->next;
+        }
+    }
+
+    fclose(fp);
+    printf("\nData saved to file successfully.\n");
+}
+
+int main() {
+    for (int i = 0; i < SIZE; i++)
+        table[i] = NULL;
+    int choice;
+    char category[20], title[100], content[500];
+    while (1) {
+        printf("\n1. Insert Text\n2. Search\n3. Display\n4. Save\n5. Exit\n");
+        printf("Enter choice: ");
+        scanf("%d", &choice);
+        getchar(); 
+
+        switch (choice) {
+            case 1:
+                printf("Enter category (Verse/Ritual/Philosophy): ");
+                fgets(category, 20, stdin);
+                category[strcspn(category, "\n")] = 0;
+                printf("Enter title: ");
+                fgets(title, 100, stdin);
+                title[strcspn(title, "\n")] = 0;
+                printf("Enter content: ");
+                fgets(content, 500, stdin);
+                content[strcspn(content, "\n")] = 0;
+                insert(category, title, content);
+                break;
+
+            case 2:
+                printf("Enter title to search: ");
+                fgets(title, 100, stdin);
+                title[strcspn(title, "\n")] = 0;
+                search(title);
+                break;
+            case 3:
+                display();
+                break;
+            case 4:
+                saveToFile();
+                break;
+            case 5:
+                exit(0);
+            default:
+                printf("Invalid choice.\n");
+        }
+    }
+    return 0;
+}
