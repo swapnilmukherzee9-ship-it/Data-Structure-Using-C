@@ -1,0 +1,111 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// Node structure
+struct Health {
+    int day;
+    int steps;
+    int calories;
+    float sleep;
+    struct Health* next;
+};
+
+// Create node
+struct Health* createNode(int day, int steps, int calories, float sleep) {
+    struct Health* newNode = (struct Health*)malloc(sizeof(struct Health));
+    newNode->day = day;
+    newNode->steps = steps;
+    newNode->calories = calories;
+    newNode->sleep = sleep;
+    newNode->next = NULL;
+    return newNode;
+}
+
+// Insert at end
+void insert(struct Health** head, int day, int steps, int calories, float sleep) {
+    struct Health* newNode = createNode(day, steps, calories, sleep);
+
+    if (*head == NULL) {
+        *head = newNode;
+        return;
+    }
+
+    struct Health* temp = *head;
+    while (temp->next != NULL)
+        temp = temp->next;
+
+    temp->next = newNode;
+}
+
+// Display data
+void display(struct Health* head) {
+    printf("\nHealth Records:\n");
+    while (head != NULL) {
+        printf("Day %d | Steps: %d | Calories: %d | Sleep: %.1f hrs\n",
+               head->day, head->steps, head->calories, head->sleep);
+        head = head->next;
+    }
+}
+
+// Compute totals and averages
+void analyze(struct Health* head) {
+    int totalSteps = 0, totalCalories = 0, days = 0;
+    float totalSleep = 0;
+
+    while (head != NULL) {
+        totalSteps += head->steps;
+        totalCalories += head->calories;
+        totalSleep += head->sleep;
+        days++;
+        head = head->next;
+    }
+
+    printf("\n--- Analysis ---\n");
+    printf("Average Steps: %d\n", totalSteps / days);
+    printf("Average Calories: %d\n", totalCalories / days);
+    printf("Average Sleep: %.2f hrs\n", totalSleep / days);
+}
+
+// Simple text visualization
+void visualize(struct Health* head) {
+    printf("\n--- Visualization (Steps) ---\n");
+
+    while (head != NULL) {
+        printf("Day %d: ", head->day);
+
+        int bars = head->steps / 1000; // scale
+        for (int i = 0; i < bars; i++)
+            printf("*");
+
+        printf(" (%d)\n", head->steps);
+        head = head->next;
+    }
+}
+
+int main() {
+    struct Health* head = NULL;
+
+    int n, steps, calories;
+    float sleep;
+
+    printf("Enter number of days: ");
+    scanf("%d", &n);
+
+    for (int i = 1; i <= n; i++) {
+        printf("\nDay %d\n", i);
+        printf("Steps: ");
+        scanf("%d", &steps);
+        printf("Calories burned: ");
+        scanf("%d", &calories);
+        printf("Sleep hours: ");
+        scanf("%f", &sleep);
+
+        insert(&head, i, steps, calories, sleep);
+    }
+
+    display(head);
+    analyze(head);
+    visualize(head);
+
+    return 0;
+}
