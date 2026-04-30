@@ -1,0 +1,75 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+struct Crop {
+    char cropName[50];
+    char soilType[50];
+    float irrigationTime; 
+    struct Crop* next;
+};
+
+struct Crop* createNode(char crop[], char soil[], float time) {
+    struct Crop* newNode = (struct Crop*)malloc(sizeof(struct Crop));
+    strcpy(newNode->cropName, crop);
+    strcpy(newNode->soilType, soil);
+    newNode->irrigationTime = time;
+    newNode->next = NULL;
+    return newNode;
+}
+
+void insert(struct Crop** head, char crop[], char soil[], float time) {
+    struct Crop* newNode = createNode(crop, soil, time);
+
+    if (*head == NULL) {
+        *head = newNode;
+        return;
+    }
+
+    struct Crop* temp = *head;
+    while (temp->next != NULL)
+        temp = temp->next;
+    temp->next = newNode;
+}
+void recommend(struct Crop* head, char crop[], char soil[]) {
+    struct Crop* temp = head;
+
+    while (temp != NULL) {
+        if (strcmp(temp->cropName, crop) == 0 &&
+            strcmp(temp->soilType, soil) == 0) {
+
+            printf("\nRecommended irrigation time: %.2f hours/day\n",
+                   temp->irrigationTime);
+            return;
+        }
+        temp = temp->next;
+    }
+    printf("\nNo data found for given crop and soil type.\n");
+}
+
+void display(struct Crop* head) {
+    struct Crop* temp = head;
+    printf("\nStored Crop Data:\n");
+
+    while (temp != NULL) {
+        printf("Crop: %s | Soil: %s | Time: %.2f hrs/day\n",
+               temp->cropName, temp->soilType, temp->irrigationTime);
+        temp = temp->next;
+    }
+}
+
+int main() {
+    struct Crop* head = NULL;
+    insert(&head, "Rice", "Clay", 5.0);
+    insert(&head, "Wheat", "Loamy", 3.0);
+    insert(&head, "Maize", "Sandy", 2.5);
+    insert(&head, "Sugarcane", "Clay", 6.0);
+    display(head);
+    char crop[50], soil[50];
+    
+    printf("\nEnter crop name: ");
+    scanf("%s", crop);
+    printf("Enter soil type: ");
+    scanf("%s", soil);
+    recommend(head, crop, soil);
+    return 0;
+}
