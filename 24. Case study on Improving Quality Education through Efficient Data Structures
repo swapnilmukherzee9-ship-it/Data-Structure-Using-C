@@ -1,0 +1,146 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#define SIZE 10
+
+struct Student {
+    int id;
+    char name[50];
+    float marks;
+    struct Student* next;
+};
+
+struct Student* table[SIZE];
+int hash(int id) {
+    return id % SIZE;
+}
+
+struct Student* createNode(int id, char name[], float marks) {
+    struct Student* newNode = (struct Student*)malloc(sizeof(struct Student));
+    newNode->id = id;
+    strcpy(newNode->name, name);
+    newNode->marks = marks;
+    newNode->next = NULL;
+    return newNode;
+}
+
+void insert(int id, char name[], float marks) {
+    int index = hash(id);
+    struct Student* newNode = createNode(id, name, marks);
+
+    newNode->next = table[index];
+    table[index] = newNode;
+}
+
+void search(int id) {
+    int index = hash(id);
+    struct Student* temp = table[index];
+
+    while (temp != NULL) {
+        if (temp->id == id) {
+            printf("\nFound: ID=%d Name=%s Marks=%.2f\n",
+                   temp->id, temp->name, temp->marks);
+            return;
+        }
+        temp = temp->next;
+    }
+    printf("\nStudent not found.\n");
+}
+
+void display() {
+    printf("\n--- Student Records ---\n");
+
+    for (int i = 0; i < SIZE; i++) {
+        struct Student* temp = table[i];
+
+        while (temp != NULL) {
+            printf("ID=%d Name=%s Marks=%.2f\n",
+                   temp->id, temp->name, temp->marks);
+            temp = temp->next;
+        }
+    }
+}
+
+void topper() {
+    float max = -1;
+    struct Student* top = NULL;
+
+    for (int i = 0; i < SIZE; i++) {
+        struct Student* temp = table[i];
+
+        while (temp != NULL) {
+            if (temp->marks > max) {
+                max = temp->marks;
+                top = temp;
+            }
+            temp = temp->next;
+        }
+    }
+    if (top != NULL) {
+        printf("\nTopper: %s (%.2f marks)\n", top->name, top->marks);
+    }
+}
+
+void average() {
+    float sum = 0;
+    int count = 0;
+
+    for (int i = 0; i < SIZE; i++) {
+        struct Student* temp = table[i];
+
+        while (temp != NULL) {
+            sum += temp->marks;
+            count++;
+            temp = temp->next;
+        }
+    }
+
+    if (count > 0)
+        printf("\nAverage Marks: %.2f\n", sum / count);
+}
+
+int main() {
+    for (int i = 0; i < SIZE; i++)
+        table[i] = NULL;
+
+    int choice, id;
+    char name[50];
+    float marks;
+
+    while (1) {
+        printf("\n1.Insert 2.Search 3.Display 4.Topper 5.Average 6.Exit\n");
+        printf("Enter choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("Enter ID: ");
+                scanf("%d", &id);
+                printf("Enter Name: ");
+                scanf("%s", name);
+                printf("Enter Marks: ");
+                scanf("%f", &marks);
+                insert(id, name, marks);
+                break;
+
+            case 2:
+                printf("Enter ID to search: ");
+                scanf("%d", &id);
+                search(id);
+                break;
+            case 3:
+                display();
+                break;
+            case 4:
+                topper();
+                break;
+            case 5:
+                average();
+                break;
+            case 6:
+                exit(0);
+            default:
+                printf("Invalid choice\n");
+        }
+    }
+}
