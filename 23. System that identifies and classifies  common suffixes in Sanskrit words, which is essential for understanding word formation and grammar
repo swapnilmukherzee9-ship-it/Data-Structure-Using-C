@@ -1,0 +1,91 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#define SIZE 10
+
+struct Suffix {
+    char suffix[20];
+    char type[20]; 
+    struct Suffix* next;
+};
+
+struct Suffix* table[SIZE];
+int hash(char suffix[]) {
+    int sum = 0;
+    for (int i = 0; suffix[i] != '\0'; i++)
+        sum += suffix[i];
+    return sum % SIZE;
+}
+
+struct Suffix* createNode(char suffix[], char type[]) {
+    struct Suffix* newNode = (struct Suffix*)malloc(sizeof(struct Suffix));
+    strcpy(newNode->suffix, suffix);
+    strcpy(newNode->type, type);
+    newNode->next = NULL;
+    return newNode;
+}
+
+void insert(char suffix[], char type[]) {
+    int index = hash(suffix);
+    struct Suffix* newNode = createNode(suffix, type);
+    newNode->next = table[index];
+    table[index] = newNode;
+}
+
+int endsWith(char word[], char suffix[]) {
+    int lenW = strlen(word);
+    int lenS = strlen(suffix);
+    if (lenS > lenW) return 0;
+    return strcmp(word + lenW - lenS, suffix) == 0;
+}
+
+void classify(char word[]) {
+    int found = 0;
+    printf("\nAnalysis for word: %s\n", word);
+    for (int i = 0; i < SIZE; i++) {
+        struct Suffix* temp = table[i];
+        while (temp != NULL) {
+            if (endsWith(word, temp->suffix)) {
+                printf("Matched Suffix: %s | Type: %s\n",
+                       temp->suffix, temp->type);
+                found = 1;
+            }
+            temp = temp->next;
+        }
+    }
+
+    if (!found)
+        printf("No known suffix found.\n");
+}
+
+void display() {
+    printf("\nStored Suffixes:\n");
+    for (int i = 0; i < SIZE; i++) {
+        struct Suffix* temp = table[i];
+        while (temp != NULL) {
+            printf("%s (%s)\n", temp->suffix, temp->type);
+            temp = temp->next;
+        }
+    }
+}
+
+int main() {
+    for (int i = 0; i < SIZE; i++)
+        table[i] = NULL;
+
+    insert("ah", "Noun");
+    insert("am", "Noun");
+    insert("ena", "Instrumental");
+    insert("aya", "Dative");
+    insert("at", "Ablative");
+    insert("ti", "Verb");
+    insert("anti", "Verb");
+    insert("tum", "Infinitive");
+
+    display();
+    char word[50];
+    printf("\nEnter Sanskrit word (in transliteration): ");
+    scanf("%s", word);
+    classify(word);
+    return 0;
+}
